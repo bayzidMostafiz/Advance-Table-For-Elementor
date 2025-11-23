@@ -368,10 +368,10 @@ class Advance_Table_Widget extends Widget_Base {
                         echo '<div class="atfe-title" style="order:'.$title_order.';">' . esc_html( $item['cell_title'] ) . '</div>';
                     }
 
-                    // 3. Content
+                    // 3. Content (Sanitized with wp_kses_post)
                     if ( ! empty( $item['column_content'] ) ) {
                         $content_order = isset($item['order_content']) ? $item['order_content'] : 3;
-                        echo '<div class="atfe-body" style="order:'.$content_order.';">' . $item['column_content'] . '</div>';
+                        echo '<div class="atfe-body" style="order:'.$content_order.'; width:100%;">' . wp_kses_post( $item['column_content'] ) . '</div>';
                     }
 
                     // 4. Button
@@ -392,7 +392,8 @@ class Advance_Table_Widget extends Widget_Base {
 
                     echo '</div>'; // End wrapper
                 } else {
-                    echo $item['column_content'];
+                    // Simple Content (Sanitized with wp_kses_post)
+                    echo wp_kses_post( $item['column_content'] );
                 }
 
                 echo "</{$tag}>";
