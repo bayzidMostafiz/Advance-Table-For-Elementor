@@ -1,0 +1,65 @@
+/* ------------------------------------------------
+   Advance Table For Elementor - Main Styles
+------------------------------------------------ */
+
+/* Wrapper for horizontal scrolling on mobile */
+.atfe-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+    width: 100%;
+}
+
+/* Main Table Structure */
+.atfe-table {
+    border-collapse: collapse;
+    margin-bottom: 0px;
+}
+
+/* Sticky Header Style */
+.atfe-table th.atfe-sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* --- Advanced Content Styles --- */
+
+/* Wrapper for Flexbox Items inside cell */
+.atfe-content-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Image/Logo inside cell */
+.atfe-image {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+}
+
+/* Title inside cell */
+.atfe-title {
+    font-weight: bold;
+    width: 100%;
+    line-height: 1.2;
+}
+
+/* Body Content */
+.atfe-body {
+    width: 100%;
+}
+
+/* Button inside cell */
+.atfe-button {
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.3s ease;
+}
+
+.atfe-button:hover {
+    opacity: 0.9;
+}
