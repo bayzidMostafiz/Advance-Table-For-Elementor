@@ -26,7 +26,6 @@ class Advance_Table_Widget extends Widget_Base {
         return [ 'basic' ];
     }
 
-    // Load the CSS file registered in the main file
     public function get_style_depends() {
         return [ 'advance-table-css' ];
     }
@@ -313,7 +312,8 @@ class Advance_Table_Widget extends Widget_Base {
         );
 
         echo '<div class="atfe-table-wrapper">';
-        echo "<table class='atfe-table' style='{$table_style}'>";
+        // FIX: Escaping the style attribute for the table
+        echo '<table class="atfe-table" style="' . esc_attr( $table_style ) . '">';
 
         if ( ! empty( $settings['table_cells'] ) ) {
             $row_open = false;
@@ -326,13 +326,14 @@ class Advance_Table_Widget extends Widget_Base {
                 }
 
                 $tag = $item['column_type'];
-                // Header Sticky Logic Class
-                $sticky_class = ($tag === 'th' && !empty($settings['sticky_header'])) ? 'atfe-sticky-header' : '';
+                // Ensure the tag is safe to output
+                if ( ! in_array( $tag, [ 'td', 'th' ] ) ) {
+                    $tag = 'td';
+                }
 
-                $colspan = $item['column_colspan'] > 1 ? "colspan='{$item['column_colspan']}'" : "";
-                $rowspan = !empty($item['column_rowspan']) && $item['column_rowspan'] > 1 ? "rowspan='{$item['column_rowspan']}'" : "";
+                $sticky_class = ($tag === 'th' && !empty($settings['sticky_header'])) ? 'atfe-sticky-header' : '';
                 
-                // Alignment mapping for flexbox
+                // Alignment mapping
                 $h_align = !empty($item['column_alignment']) ? $item['column_alignment'] : 'left';
                 $flex_align = 'flex-start';
                 if ($h_align === 'center') $flex_align = 'center';
@@ -340,63 +341,95 @@ class Advance_Table_Widget extends Widget_Base {
 
                 $styles = [];
                 $styles[] = "border: 1px solid " . $settings['table_border_color'];
-                $styles[] = "text-align: {$h_align}"; // For fallback text
-                if (!empty($item['vertical_alignment'])) $styles[] = "vertical-align: {$item['vertical_alignment']}";
-                if (!empty($item['column_bg'])) $styles[] = "background-color: {$item['column_bg']}";
-                if (!empty($item['column_color'])) $styles[] = "color: {$item['column_color']}";
-                if (!empty($item['custom_width'])) $styles[] = "width: {$item['custom_width']}%";
+                $styles[] = "text-align: " . $h_align;
+                if (!empty($item['vertical_alignment'])) $styles[] = "vertical-align: " . $item['vertical_alignment'];
+                if (!empty($item['column_bg'])) $styles[] = "background-color: " . $item['column_bg'];
+                if (!empty($item['column_color'])) $styles[] = "color: " . $item['column_color'];
+                if (!empty($item['custom_width'])) $styles[] = "width: " . $item['custom_width'] . "%";
 
-                $style_attr = 'style="' . implode('; ', $styles) . '"';
+                $style_string = implode( '; ', $styles );
+                
+                $colspan_val = (int) $item['column_colspan'];
+                $rowspan_val = (int) $item['column_rowspan'];
 
-                echo "<{$tag} class='{$sticky_class}' {$colspan} {$rowspan} {$style_attr}>";
+                // FIX: Building the tag attributes with proper escaping
+                echo '<' . tag_escape( $tag ) . ' class="' . esc_attr( $sticky_class ) . '" style="' . esc_attr( $style_string ) . '"';
+                
+                if ( $colspan_val > 1 ) {
+                    echo ' colspan="' . esc_attr( $colspan_val ) . '"';
+                }
+                if ( $rowspan_val > 1 ) {
+                    echo ' rowspan="' . esc_attr( $rowspan_val ) . '"';
+                }
+                
+                echo '>';
 
                 if ( $item['enable_advanced'] === 'yes' ) {
-                    // Flex container for ordering
-                    echo '<div class="atfe-content-wrapper" style="align-items:'.$flex_align.';">';
+                    // FIX: Escaping flex alignment
+                    echo '<div class="atfe-content-wrapper" style="align-items:' . esc_attr( $flex_align ) . ';">';
                     
                     // 1. Image
                     if ( ! empty( $item['cell_image']['url'] ) ) {
-                        $img_order = isset($item['order_image']) ? $item['order_image'] : 1;
-                        echo '<div style="order:'.$img_order.'; width:100%;">'; // Wrapper for order
+                        $img_order = isset($item['order_image']) ? (int) $item['order_image'] : 1;
+                        // FIX: Escaping order style
+                        echo '<div style="order:' . esc_attr( $img_order ) . '; width:100%;">';
                         echo '<img class="atfe-image" src="' . esc_url( $item['cell_image']['url'] ) . '" alt="table-img">';
                         echo '</div>';
                     }
 
                     // 2. Title
                     if ( ! empty( $item['cell_title'] ) ) {
-                        $title_order = isset($item['order_title']) ? $item['order_title'] : 2;
-                        echo '<div class="atfe-title" style="order:'.$title_order.';">' . esc_html( $item['cell_title'] ) . '</div>';
+                        $title_order = isset($item['order_title']) ? (int) $item['order_title'] : 2;
+                        // FIX: Escaping order style
+                        echo '<div class="atfe-title" style="order:' . esc_attr( $title_order ) . ';">' . esc_html( $item['cell_title'] ) . '</div>';
                     }
 
-                    // 3. Content (Sanitized with wp_kses_post)
+                    // 3. Content
                     if ( ! empty( $item['column_content'] ) ) {
-                        $content_order = isset($item['order_content']) ? $item['order_content'] : 3;
-                        echo '<div class="atfe-body" style="order:'.$content_order.'; width:100%;">' . wp_kses_post( $item['column_content'] ) . '</div>';
+                        $content_order = isset($item['order_content']) ? (int) $item['order_content'] : 3;
+                        // FIX: Escaping order style & sanitizing content
+                        echo '<div class="atfe-body" style="order:' . esc_attr( $content_order ) . '; width:100%;">' . wp_kses_post( $item['column_content'] ) . '</div>';
                     }
 
                     // 4. Button
                     if ( ! empty( $item['cell_btn_text'] ) ) {
-                        $btn_order = isset($item['order_btn']) ? $item['order_btn'] : 4;
+                        $btn_order = isset($item['order_btn']) ? (int) $item['order_btn'] : 4;
                         
-                        $link_attr = 'href="#"';
+                        $btn_url = '#';
+                        $btn_target = '';
+                        $btn_nofollow = '';
+
                         if ( ! empty( $item['cell_btn_link']['url'] ) ) {
-                            $link_attr = 'href="' . esc_url( $item['cell_btn_link']['url'] ) . '"';
-                            if ( $item['cell_btn_link']['is_external'] ) $link_attr .= ' target="_blank"';
-                            if ( $item['cell_btn_link']['nofollow'] ) $link_attr .= ' rel="nofollow"';
+                            $btn_url = $item['cell_btn_link']['url'];
+                            $btn_target = $item['cell_btn_link']['is_external'] ? '_blank' : '';
+                            $btn_nofollow = $item['cell_btn_link']['nofollow'] ? 'nofollow' : '';
                         }
                         
-                        echo '<div style="order:'.$btn_order.'; width:100%;">';
-                        echo '<a class="atfe-button" ' . $link_attr . '>' . esc_html( $item['cell_btn_text'] ) . '</a>';
+                        // FIX: Escaping order style
+                        echo '<div style="order:' . esc_attr( $btn_order ) . '; width:100%;">';
+                        
+                        // FIX: Deconstructed and escaped attributes individually
+                        echo '<a class="atfe-button" href="' . esc_url( $btn_url ) . '"';
+                        
+                        if ( ! empty( $btn_target ) ) {
+                            echo ' target="' . esc_attr( $btn_target ) . '"';
+                        }
+                        if ( ! empty( $btn_nofollow ) ) {
+                            echo ' rel="' . esc_attr( $btn_nofollow ) . '"';
+                        }
+                        
+                        echo '>' . esc_html( $item['cell_btn_text'] ) . '</a>';
                         echo '</div>';
                     }
 
                     echo '</div>'; // End wrapper
                 } else {
-                    // Simple Content (Sanitized with wp_kses_post)
+                    // FIX: Sanitizing simple content
                     echo wp_kses_post( $item['column_content'] );
                 }
 
-                echo "</{$tag}>";
+                // FIX: Escaping closing tag
+                echo '</' . tag_escape( $tag ) . '>';
             }
             if ( $row_open ) echo '</tr>';
         }
