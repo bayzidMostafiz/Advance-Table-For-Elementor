@@ -1,17 +1,17 @@
 <?php
 /*
   Plugin Name:       Advance Table For Elementor
-  Plugin URI:        https://your-site.com/plugin-link
+  Plugin URI:        https://github.com/bayzidMostafiz/Advance-Table-For-Elementor.git
   Description:       An advanced, responsive table widget for Elementor with custom content support, flexbox ordering, and sticky headers.
   Version:           1.0.0
-  Author:      Md. Bayzid Mostafiz
-  Author URI:  https://www.linkedin.com/in/md-bayzid-mostafiz-152b80139/
+  Author:            Md. Bayzid Mostafiz
+  Author URI:        https://www.linkedin.com/in/md-bayzid-mostafiz-152b80139/
   Requires at least: 6.0
   License:           GPLv2 or later
   License URI:       http://www.gnu.org/licenses/gpl-2.0.html
   Text Domain:       advance-table-for-elementor
   Requires at least: 6.0
-  Tested up to: 6.8
+  Tested up to:      6.8
   Elementor tested up to: 3.32.0
 
  */
